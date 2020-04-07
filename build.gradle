@@ -111,6 +111,10 @@ task copyJarToServerJar(type: Copy) {
     into 'build/libs'
 }
 
+bootRun {
+    systemProperties System.properties
+}
+
 task run {
     dependsOn 'bootRun'
 }

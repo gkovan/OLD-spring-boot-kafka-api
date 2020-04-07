@@ -4,11 +4,11 @@ import java.util.Arrays;
 import java.util.Locale;
 import java.util.Properties;
 
+import com.ibm.kafkastream.wordcount.config.WordCountKafkaConfiguration;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.common.utils.Bytes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
-import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Materialized;
@@ -16,6 +16,7 @@ import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -25,12 +26,14 @@ public class WordCountKafkaStreamOperator {
 
     private final KafkaStreams streams;
     private final Topology topology;
+    private final WordCountKafkaConfiguration kafkaConfiguration;
     final StreamsBuilder builder = new StreamsBuilder();
     Properties props = new Properties();
 
 
-    
-    public WordCountKafkaStreamOperator() {
+    @Autowired
+    public WordCountKafkaStreamOperator(WordCountKafkaConfiguration kafkaConfiguration) {
+        this.kafkaConfiguration = kafkaConfiguration;
         defineStream();
         topology = builder.build();
         streams = new KafkaStreams(topology, props);
@@ -38,21 +41,15 @@ public class WordCountKafkaStreamOperator {
     }
     
     private void defineStream() {
-    	
-        props.put(StreamsConfig.APPLICATION_ID_CONFIG, "streams-wordcount");
-        props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
-        props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
-
-        //props = getKafkaConfiguration().getStreamingProperties("SampleStreamer");
+        props = kafkaConfiguration.buildStreamingProperties();
     	        
-        KStream<String, String> source = builder.stream("streams-wordcount-plaintext-input");
+        KStream<String, String> source = builder.stream(kafkaConfiguration.getStreamingInputTopicName());
        
         source.flatMapValues(value -> Arrays.asList(value.toLowerCase(Locale.getDefault()).split("\\W+")))
               .groupBy((key, value) -> value)
-              .count(Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as("counts-store"))
+              .count(Materialized.<String, Long, KeyValueStore<Bytes, byte[]>>as(kafkaConfiguration.getStreamingStoreName()))
               .toStream()
-              .to("streams-wordcount-output", Produced.with(Serdes.String(), Serdes.Long()));
+              .to(kafkaConfiguration.getStreamingOutputTopicName(), Produced.with(Serdes.String(), Serdes.Long()));
     }
 	
     public void start() {

@@ -15,7 +15,7 @@ public class OrderProducerKafkaTemplate {
 
 	@Bean("orderProducerKafkaTemplateA") 
 	public KafkaProducer<String, String> getOrderProducerKafkaTemplate() {
-		Properties properties = kafkaConfiguration.getProducerProperties("order-event-producer");
+		Properties properties = kafkaConfiguration.buildProducerProperties();
 		return new KafkaProducer<String, String>(properties);
 	}
 }

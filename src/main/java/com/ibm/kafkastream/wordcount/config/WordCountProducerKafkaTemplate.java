@@ -15,7 +15,7 @@ public class WordCountProducerKafkaTemplate {
 
 	@Bean("wordCountProducerKafkaTemplateA")
 	public KafkaProducer<String, String> getWordCountProducerKafkaTemplate() {
-		Properties properties = kafkaConfiguration.getProducerProperties("word-count-producer");
+		Properties properties = kafkaConfiguration.buildProducerProperties();
 		return new KafkaProducer<String, String>(properties);
 	}
 }

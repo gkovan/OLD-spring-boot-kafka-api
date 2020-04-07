@@ -12,11 +12,11 @@ import com.ibm.kafkastream.wordcount.service.WordCountKafkaStreamOperator;
 
 /**
  * Servlet context listener to start consumer of the kafka stream that will count the words.
- * As the consumer acts as an agent, continuously listening to
- * events, we need to start them when the encapsulating app / microservice is successfuly
- * started, which is why we have to implement a servlet context listener.
- *  
- *  When the application stops we need to close safely the consumers.
+ *  * As the consumer acts as an agent, continuously listening to
+ *  * events, we need to start them when the encapsulating app / microservice is successfuly
+ *  * started, which is why we have to implement a servlet context listener.
+ *  *
+ *  *  When the application stops we need to close safely the consumers.
  *
  */
 @WebListener

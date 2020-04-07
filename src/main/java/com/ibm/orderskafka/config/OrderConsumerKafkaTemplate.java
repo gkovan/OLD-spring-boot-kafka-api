@@ -17,11 +17,7 @@ public class OrderConsumerKafkaTemplate {
 	public KafkaConsumer<String, String> getOrderConsumerKafkaTemplate() {
     	// if we need to have multiple threads then the clientId needs to be different
     	// auto commit is set to true, and read from the last not committed offset
-    	Properties properties = kafkaConfiguration.getConsumerProperties(
-          		"OrderEventsAgent",	
-          		true,  
-          		"latest" );
+    	Properties properties = kafkaConfiguration.buildConsumerProperties();
 		return new KafkaConsumer<String, String>(properties);
 	}
-
 }
