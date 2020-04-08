@@ -160,7 +160,7 @@ spec:
                   exit 0
                 fi
 
-                if [[ $(./gradlew tasks --all | grep -Eq "^sonarqube") ]]; then
+                if $(./gradlew tasks --all | grep -Eq "^sonarqube") ; then
                     echo "SonarQube task found"
                 else
                     echo "Skipping SonarQube step, no task defined"
@@ -177,13 +177,14 @@ spec:
                     set -x
                     set -e
 
+                    git config --local credential.helper "!f() { echo username=\\$GIT_AUTH_USER; echo password=\\$GIT_AUTH_PWD; }; f"
+
                     git fetch origin ${BRANCH} --tags
                     git checkout ${BRANCH}
                     git branch --set-upstream-to=origin/${BRANCH} ${BRANCH}
 
                     git config --global user.name "Jenkins Pipeline"
                     git config --global user.email "jenkins@ibmcloud.com"
-                    git config --local credential.helper "!f() { echo username=\\$GIT_AUTH_USER; echo password=\\$GIT_AUTH_PWD; }; f"
 
                     mkdir -p ~/.npm
                     npm config set prefix ~/.npm
