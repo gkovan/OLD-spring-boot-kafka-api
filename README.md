@@ -157,3 +157,26 @@ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
     --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer \
     --property value.deserializer=org.apache.kafka.common.serialization.LongDeserializer
 ```
+
+## Pipe Streaming Kafka example 
+
+
+
+For the pipe stream app to work, the following topics needs to be created:
+
+```bash
+./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic streams-pipe-input
+```
+```bash
+./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic streams-pipe-output
+```
+
+
+Start a kafka producer and consumer as follows:
+
+```bash
+./bin/kafka-console-producer.sh --broklist localhost:9092 --topic streams-pipe-input
+```
+```bash
+./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic streams-pipe-output --from-beginning
+```
