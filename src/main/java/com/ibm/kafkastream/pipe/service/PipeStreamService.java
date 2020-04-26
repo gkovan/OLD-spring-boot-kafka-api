@@ -11,12 +11,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import com.ibm.kafkastream.wordcount.service.WordCountKafkaStreamOperator;
-
 @Service
 public class PipeStreamService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(WordCountKafkaStreamOperator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PipeStreamService.class);
 
 	private KafkaStreams streams = null;
 	private Topology topology = null;
