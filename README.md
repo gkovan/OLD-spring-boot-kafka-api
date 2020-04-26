@@ -175,7 +175,7 @@ For the pipe stream app to work, the following topics needs to be created:
 Start a kafka producer and consumer as follows:
 
 ```bash
-./bin/kafka-console-producer.sh --broklist localhost:9092 --topic streams-pipe-input
+./bin/kafka-console-producer.sh --broker-list localhost:9092 --topic streams-pipe-input
 ```
 ```bash
 ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic streams-pipe-output --from-beginning

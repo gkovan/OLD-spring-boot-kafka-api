@@ -22,6 +22,17 @@ public class PipeStreamService {
 	private Topology topology = null;
 	private final StreamsBuilder builder = new StreamsBuilder();
 	private final Properties props = new Properties();
+	
+	public static String INPUT_TOPIC = "streams-pipe-input";
+	public static String OUTPUT_TOPIC = "streams-pipe-output";
+	
+	public Topology getTopology() {
+		return topology;
+	}
+	
+	public Properties getProperties() {
+		return props;
+	}
 
 	public PipeStreamService() {
 		super();
@@ -32,7 +43,7 @@ public class PipeStreamService {
 		props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 		props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
 		
-		builder.stream("streams-pipe-input").to("streams-pipe-output");
+		builder.stream(INPUT_TOPIC).to(OUTPUT_TOPIC);
 		
         topology = builder.build();
         
