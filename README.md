@@ -160,8 +160,7 @@ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
 
 ## Pipe Streaming Kafka example 
 
-
-
+The pipe stream app basically takes the value on the input topic and puts it on the output topic.
 For the pipe stream app to work, the following topics needs to be created:
 
 ```bash
@@ -171,7 +170,6 @@ For the pipe stream app to work, the following topics needs to be created:
 ./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic streams-pipe-output
 ```
 
-
 Start a kafka producer and consumer as follows:
 
 ```bash
@@ -180,3 +178,28 @@ Start a kafka producer and consumer as follows:
 ```bash
 ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic streams-pipe-output --from-beginning
 ```
+
+## Mapping Stream Kafka example
+
+The mapping stream app reverses the key value pair so that on record on the output topic has the value as the key and the key as the value.  
+
+
+For the mapping stream app to work, the following topics needs to be created:
+
+```bash
+./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic mapping-stream-input
+```
+```bash
+./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic mapping-stream-output
+```
+ 
+ Start a kafka producer and consumer as follows:   
+
+```bash
+./bin/kafka-console-producer.sh --broker-list localhost:9092     --topic mapping-streamput     --property "parse.key=true"     --property "key.separator=:"
+```
+
+```bash
+./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092     --topic mapping-stream-output     --from-beginning     --formatter kafka.tools.DefaultMessageFormatter     --property print.key=true     --property print.value=true     --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer     --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+```    
+    

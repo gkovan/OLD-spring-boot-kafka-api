@@ -45,7 +45,7 @@ public class MappingStreamAppTest {
     public void setup() {
         final StreamsBuilder builder = new StreamsBuilder();
         //Create Actual Stream Processing pipeline
-        MappingStreamApp.createStream(builder);
+        MappingStreamApp.createStreamKeyIsLongValueIsString(builder);
         testDriver = new TopologyTestDriver(builder.build(), MappingStreamApp.getStreamsConfig());
         inputTopic = testDriver.createInputTopic(MappingStreamApp.INPUT_TOPIC, new LongSerializer(), new StringSerializer(),
                 recordBaseTime, advance1Min);

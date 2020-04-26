@@ -43,6 +43,7 @@ public class MappingStreamApp {
         final Properties props = new Properties();
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "mapping-stream-app");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+        
         return props;
     }
 
@@ -52,23 +53,30 @@ public class MappingStreamApp {
      */
     static void createStream(StreamsBuilder builder) {
         final Serde<String> stringSerde = new Serdes.StringSerde();
+        final KStream<String, String> source = builder.stream(INPUT_TOPIC, Consumed.with(stringSerde, stringSerde));
+        final KStream<String, String> mapped = source.map((key, value) -> new KeyValue<String,String>(value, key));
+        mapped.to(OUTPUT_TOPIC, Produced.with(stringSerde, stringSerde));
+    }
+    
+    static void createStreamKeyIsLongValueIsString(StreamsBuilder builder) {
+        final Serde<String> stringSerde = new Serdes.StringSerde();
         final Serde<Long> longSerde = new Serdes.LongSerde();
         final KStream<Long, String> source = builder.stream(INPUT_TOPIC, Consumed.with(longSerde, stringSerde));
-        final KStream<String, Long> mapped = source.map((key, value) -> new KeyValue<>(value, key));
+        final KStream<String, Long> mapped = source.map((key, value) -> new KeyValue<String,Long>(value, key));
         mapped.to(OUTPUT_TOPIC, Produced.with(stringSerde, longSerde));
     }
 
 	public void start() {
-		LOGGER.info("Pipe Stream Operator started.");
+		LOGGER.info("Mapping Stream Service started.");
 		try {
 			streams.start();
 		} catch (final Throwable e) {
-			LOGGER.error("Error starting the Pipe Stream Service.", e);
+			LOGGER.error("Error starting the Mapping Stream Service.", e);
 		}
 	}
 
 	public void stop() {
-		LOGGER.info("Pipe Stream Operator stopped");
+		LOGGER.info("Mapping Stream Service stopped");
 		streams.close();
 	}
 
