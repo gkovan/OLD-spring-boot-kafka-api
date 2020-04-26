@@ -51,16 +51,16 @@ public class PipeStreamService {
 	}
 
 	public void start() {
-		LOGGER.info("WordCount Stream Operator started.");
+		LOGGER.info("Pipe Stream Service started.");
 		try {
 			streams.start();
 		} catch (final Throwable e) {
-			LOGGER.error("Error starting the WordCount Stream Operator.", e);
+			LOGGER.error("Error starting the Pipe Stream Service.", e);
 		}
 	}
 
 	public void stop() {
-		LOGGER.info("WordCount Stream Operator stopped");
+		LOGGER.info("Pipe Stream Service stopped");
 		streams.close();
 	}
 
