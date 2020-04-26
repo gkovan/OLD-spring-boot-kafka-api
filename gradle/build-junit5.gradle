@@ -12,6 +12,9 @@ dependencies {
             "org.junit.jupiter:junit-jupiter-engine:${junitVersion}",
             "org.junit.vintage:junit-vintage-engine:${junitVersion}"
     )
+    
+    compile group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.7.0-M1'
+    testCompile group: 'org.junit.platform', name: 'junit-platform-engine', version: '1.7.0-M1'
 }
 
 

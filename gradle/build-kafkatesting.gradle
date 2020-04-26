@@ -1,0 +1,8 @@
+dependencies {   
+    // https://mvnrepository.com/artifact/org.apache.kafka/kafka-streams-test-utils
+    //testCompile group: 'org.apache.kafka', name: 'kafka-streams-test-utils', version: '2.4.1'
+
+    // https://mvnrepository.com/artifact/org.jsmart/zerocode-tdd
+    // Have not tried zercode-tdd yet.  To try it out uncomment next line
+    //compile group: 'org.jsmart', name: 'zerocode-tdd', version: '1.3.18'
+}

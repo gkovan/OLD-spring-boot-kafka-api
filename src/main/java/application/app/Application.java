@@ -12,9 +12,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.core.env.Environment;
 
-@ServletComponentScan({"com.ibm.orderskafka.*", "com.ibm.kafkastream.wordcount.*"})
+@ServletComponentScan({"com.ibm.orderskafka.*", "com.ibm.kafkastream.wordcount.*", "com.ibm.kafkastream.pipe.*", "com.ibm.kafkastream.mapping.*"})
 @SpringBootApplication
-@ComponentScan({"com.ibm.hello.*","com.ibm.simplekafka.*", "com.ibm.orderskafka.*", "com.ibm.config", "com.ibm.kafkastream.wordcount.*", "com.ibm.cloud_garage.*", "com.ibm.health"})
+@ComponentScan({"com.ibm.hello.*","com.ibm.simplekafka.*", "com.ibm.orderskafka.*", "com.ibm.config", "com.ibm.kafkastream.wordcount.*", "com.ibm.kafkastream.pipe.*", "com.ibm.kafkastream.mapping.*", "com.ibm.cloud_garage.*", "com.ibm.health"})
 public class Application extends SpringBootServletInitializer {
     @Autowired
     Environment environment;

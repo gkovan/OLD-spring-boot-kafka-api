@@ -10,6 +10,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 import java.util.ArrayList;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Matchers;
@@ -19,6 +20,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 // Note PowerMock only works with Junit 4 currently!
+@Ignore
 @RunWith(PowerMockRunner.class)
 @PrepareForTest(HelloUtil.class)
 public class HelloUtilTest {

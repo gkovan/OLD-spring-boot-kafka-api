@@ -95,6 +95,7 @@ apply from:   'gradle/build-githooks.gradle'
 // apply from:   'gradle/build-liberty.gradle'
 apply from:   'gradle/build-pact-provider.gradle'
 apply from:    'gradle/build-kafka.gradle'
+apply from:    'gradle/build-kafkatesting.gradle'
 
 apply plugin: "org.sonarqube"
 
