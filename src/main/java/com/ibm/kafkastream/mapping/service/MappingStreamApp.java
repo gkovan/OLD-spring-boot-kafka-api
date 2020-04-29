@@ -1,5 +1,6 @@
 package com.ibm.kafkastream.mapping.service;
 
+import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 
@@ -12,6 +13,8 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.kstream.TimeWindows;
+import org.apache.kafka.streams.kstream.Windowed;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -55,7 +58,14 @@ public class MappingStreamApp {
         final Serde<String> stringSerde = new Serdes.StringSerde();
         final KStream<String, String> source = builder.stream(INPUT_TOPIC, Consumed.with(stringSerde, stringSerde));
         final KStream<String, String> mapped = source.map((key, value) -> new KeyValue<String,String>(value, key));
-        mapped.to(OUTPUT_TOPIC, Produced.with(stringSerde, stringSerde));
+        source.groupByKey()
+        .windowedBy(TimeWindows.of(Duration.ofMinutes(10)))
+        .count()
+        .toStream()
+        .map((Windowed<String> key, Long count) -> new KeyValue(key.key(), count.toString()))
+        .to(OUTPUT_TOPIC,Produced.with(stringSerde, stringSerde));
+        		
+        //mapped.to(OUTPUT_TOPIC, Produced.with(stringSerde, stringSerde));
     }
     
     static void createStreamKeyIsLongValueIsString(StreamsBuilder builder) {
