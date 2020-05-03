@@ -9,12 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.ibm.kafkastream.pipe.service.PipeStreamService;
-import com.ibm.kafkastream.wordcount.listener.WordCountAppContextListener;
 
 @WebListener
 public class PipeAppContextListener implements ServletContextListener {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(WordCountAppContextListener.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(PipeAppContextListener.class);
 
 	@Autowired
 	PipeStreamService pipeStreamService;
