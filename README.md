@@ -202,4 +202,26 @@ For the mapping stream app to work, the following topics needs to be created:
 ```bash
 ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092     --topic mapping-stream-output     --from-beginning     --formatter kafka.tools.DefaultMessageFormatter     --property print.key=true     --property print.value=true     --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer     --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 ```    
-    
+
+## Window count Kafka example
+
+Counts the number of times the input record 'key' occurs in the specified kafka window duration
+
+Topics:
+
+```bash
+./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic window-stream-input
+```
+```bash
+./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic window-stream-output
+```
+
+Producer and Consumer
+
+```bash
+./bin/kafka-console-producer.sh --broker-list localhost:9092     --topic window-stream-input     --property "parse.key=true"     --property "key.separator=:"
+```
+
+```bash
+./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092     --topic window-stream-output     --from-beginning     --formatter kafka.tools.DefaultMessageFormatter     --property print.key=true     --property print.value=true     --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer     --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
+```    
