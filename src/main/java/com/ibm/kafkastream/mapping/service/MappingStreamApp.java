@@ -12,9 +12,13 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.kstream.Suppressed;
+import org.apache.kafka.streams.kstream.Suppressed.BufferConfig;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.kstream.Windowed;
+import org.apache.kafka.streams.kstream.WindowedSerdes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -44,6 +48,10 @@ public class MappingStreamApp {
 
     static Properties getStreamsConfig() {
         final Properties props = new Properties();
+        
+        props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+        props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass());
+
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "mapping-stream-app");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         
@@ -57,13 +65,18 @@ public class MappingStreamApp {
     static void createStream(StreamsBuilder builder) {
         final Serde<String> stringSerde = new Serdes.StringSerde();
         final KStream<String, String> source = builder.stream(INPUT_TOPIC, Consumed.with(stringSerde, stringSerde));
-        final KStream<String, String> mapped = source.map((key, value) -> new KeyValue<String,String>(value, key));
-        source.groupByKey()
-        .windowedBy(TimeWindows.of(Duration.ofMinutes(10)))
+        final KStream<String, String> mapped = source.map((key, value) -> new KeyValue<String,String>(key, value));
+        source.map((key, record) -> new KeyValue<String,String>(key,record))
+        .groupByKey()
+        //source.groupByKey()
+        .windowedBy(TimeWindows.of(Duration.ofSeconds(10)))
         .count()
+        // with this line nothing was produced on output topic .suppress(Suppressed.untilWindowCloses(BufferConfig.unbounded()))
+        // this did not seem to work either .suppress(Suppressed.untilTimeLimit(Duration.ofSeconds(60), BufferConfig.unbounded()))  //        WindowCloses(BufferConfig.unbounded()))
         .toStream()
         .map((Windowed<String> key, Long count) -> new KeyValue(key.key(), count.toString()))
-        .to(OUTPUT_TOPIC,Produced.with(stringSerde, stringSerde));
+        //.to(OUTPUT_TOPIC,Produced.keySerde(WindowedSerdes.timeWindowedSerdeFrom(String.class)));
+        .to(OUTPUT_TOPIC,Produced.with(Serdes.String(), Serdes.String()));
         		
         //mapped.to(OUTPUT_TOPIC, Produced.with(stringSerde, stringSerde));
     }
