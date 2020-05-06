@@ -1,6 +1,5 @@
 package com.ibm.kafkastream.window.service;
 
-import org.springframework.stereotype.Service;
 import java.time.Duration;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
@@ -13,15 +12,14 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.Suppressed;
-import org.apache.kafka.streams.kstream.Suppressed.BufferConfig;
 import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.kstream.Windowed;
-import org.apache.kafka.streams.kstream.WindowedSerdes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 
 @Service
@@ -54,6 +52,13 @@ public class WindowStreamService {
         props.put(StreamsConfig.APPLICATION_ID_CONFIG, "window-stream-app");
         props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
         
+        // this parameter sets the commit interval.  
+        // for this example, we count the keys on the input record
+        // the count is stored in a Ktable.
+        // this param controls how often the data is commited to the Ktable.
+        // without the suppress, an output record is emitted when a commit is done
+        props.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, 10000);
+        
         return props;
     }
 
@@ -61,14 +66,19 @@ public class WindowStreamService {
      *
      * @param builder
      */
-    static void createStream(StreamsBuilder builder) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	static void createStream(StreamsBuilder builder) {
         final Serde<String> stringSerde = new Serdes.StringSerde();
         final KStream<String, String> source = builder.stream(INPUT_TOPIC, Consumed.with(stringSerde, stringSerde));
         final KStream<String, String> mapped = source.map((key, value) -> new KeyValue<String,String>(key, value));
         source.map((key, record) -> new KeyValue<String,String>(key,record))
         .groupByKey()
-        .windowedBy(TimeWindows.of(Duration.ofSeconds(10)))
-        .count()
+        // without grace, the default is 24 hours so window will not close for a while
+        .windowedBy(TimeWindows.of(Duration.ofSeconds(10)).grace(Duration.ofSeconds(2))) 
+        //.count()
+        .count(Materialized.with(Serdes.String(), Serdes.Long()))
+        // suppress output records until the window closes
+        .suppress(Suppressed.untilWindowCloses(Suppressed.BufferConfig.unbounded()))
         .toStream()
         .map((Windowed<String> key, Long count) -> new KeyValue(key.key(), count.toString()))
         .to(OUTPUT_TOPIC,Produced.with(Serdes.String(), Serdes.String()));        		
@@ -83,16 +93,16 @@ public class WindowStreamService {
     }
 
 	public void start() {
-		LOGGER.info("Mapping Stream Service started.");
+		LOGGER.info("Window Stream Service started.");
 		try {
 			streams.start();
 		} catch (final Throwable e) {
-			LOGGER.error("Error starting the Mapping Stream Service.", e);
+			LOGGER.error("Error starting the Window Stream Service.", e);
 		}
 	}
 
 	public void stop() {
-		LOGGER.info("Mapping Stream Service stopped");
+		LOGGER.info("Window Stream Service stopped");
 		streams.close();
 	}
 	
