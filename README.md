@@ -225,3 +225,23 @@ Producer and Consumer
 ```bash
 ./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092     --topic window-stream-output     --from-beginning     --formatter kafka.tools.DefaultMessageFormatter     --property print.key=true     --property print.value=true     --property key.deserializer=org.apache.kafka.common.serialization.StringDeserializer     --property value.deserializer=org.apache.kafka.common.serialization.StringDeserializer
 ```    
+## json serializer and deserializer example
+
+Topics:
+
+```bash
+./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic json-input
+```
+```bash
+./bin/kafka-topics.sh --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1 --topic string-ouput
+```
+
+To observe the input and output topics:
+
+```bash
+./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic json-input --from-beginning
+```
+```bash
+./bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic string-output --from-beginning
+```
+
