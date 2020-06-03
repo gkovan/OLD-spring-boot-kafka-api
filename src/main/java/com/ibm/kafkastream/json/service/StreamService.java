@@ -76,7 +76,8 @@ public class StreamService {
 		KStream<String, String> output = source.mapValues((record) -> {
 			LOGGER.info("gkabc");
 			return record.getRequestId() + ":" + record.getRequestName();
-		});
+		}).filter((key, record) -> myfilterRecord(record));;
+		//output.filter((key, record) -> myfilterRecord(record));
 		output.to(OUTPUT_TOPIC, Produced.with(stringSerde, stringSerde));
 		
         topology = builder.build();
@@ -84,6 +85,11 @@ public class StreamService {
         streams = new KafkaStreams(topology, props);
 	}
 	
+	private boolean myfilterRecord(String record) {
+		// TODO Auto-generated method stub
+		return record.contains("Ramesh");
+	}
+
 	public Topology getTopology() {
 		return topology;
 	}

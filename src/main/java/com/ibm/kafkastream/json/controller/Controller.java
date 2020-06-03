@@ -15,7 +15,7 @@ public class Controller {
 	
 	@GetMapping("/json")
 	public String test() {
-		MyRequest myRequest = new MyRequest("gerry kovan", "123456789");
+		MyRequest myRequest = new MyRequest("Gerry", "123456789");
 		producerService.sendRecord(myRequest);
 		return "hi";
 	}
