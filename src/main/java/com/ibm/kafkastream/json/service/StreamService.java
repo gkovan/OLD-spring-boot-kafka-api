@@ -17,8 +17,10 @@ import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Produced;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.ibm.kafkastream.json.config.ApplicationProperties;
 import com.ibm.kafkastream.json.config.JsonPOJODeserializer;
 import com.ibm.kafkastream.json.config.JsonPOJOSerializer;
 import com.ibm.kafkastream.json.model.MyRequest;
@@ -42,14 +44,15 @@ public class StreamService {
 	private final Properties props = new Properties();
 	
 	public static String INPUT_TOPIC = "json-input";
-	public static String OUTPUT_TOPIC = "string-output";
+	public static String OUTPUT_TOPIC = "json-input";
 	
 	final Serde<String> stringSerde = new Serdes.StringSerde();
 
 
+//	ApplicationProperties appProps = new ApplicationProperties();
 	
-	
-	public StreamService() {
+	@Autowired
+	public StreamService(ApplicationProperties appProps) {
 		super();
 		// TODO Auto-generated constructor stub
 		
@@ -73,21 +76,29 @@ public class StreamService {
 		
 		KStream<String, MyRequest> source = builder.stream(INPUT_TOPIC, Consumed.with(Serdes.String(), myRequestSerde));
 		
-		KStream<String, String> output = source.mapValues((record) -> {
-			LOGGER.info("gkabc");
-			return record.getRequestId() + ":" + record.getRequestName();
+		KStream<String, MyRequest> output = source.mapValues((record) -> {
+			LOGGER.info("############# Request name: {}", record.getRequestName());
+			record.setRequestName(record.getRequestName().toUpperCase());
+			return record;
 		}).filter((key, record) -> myfilterRecord(record));;
-		//output.filter((key, record) -> myfilterRecord(record));
-		output.to(OUTPUT_TOPIC, Produced.with(stringSerde, stringSerde));
+		output.to(OUTPUT_TOPIC, Produced.with(stringSerde, myRequestSerde));
 		
         topology = builder.build();
         
-        streams = new KafkaStreams(topology, props);
+//        streams = new KafkaStreams(topology, props);
+        
+		 String bootstrapServers = "broker-5-cll14zkm8222msbg.kafka.svc03.us-south.eventstreams.cloud.ibm.com:9093,broker-4-cll14zkm8222msbg.kafka.svc03.us-south.eventstreams.cloud.ibm.com:9093";
+		 String apikey = "LMiMktfiLQZX5hYpeph53nCjuH8b7kU0QKg1PDB5KufV";
+		 Map<String, Object> myMaps = appProps.getStreamConfigs(bootstrapServers, apikey);
+		 Properties myProps = new Properties();
+		 myProps.putAll(myMaps);
+         streams = new KafkaStreams(topology, myProps);
+
 	}
 	
-	private boolean myfilterRecord(String record) {
+	private boolean myfilterRecord(MyRequest record) {
 		// TODO Auto-generated method stub
-		return record.contains("Ramesh");
+		return record.getRequestName().contains("ramesh");
 	}
 
 	public Topology getTopology() {

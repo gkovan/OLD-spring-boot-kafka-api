@@ -1,6 +1,7 @@
 package com.ibm.kafkastream.json.service;
 
 import java.util.Properties;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +28,8 @@ public class ProducerService {
 	private Producer<String, MyRequest> producer;
 	
 	
-	public ProducerService() {
+	@Autowired
+	public ProducerService(ApplicationProperties appProps) {
 		super();
 		
 		 Properties props = new Properties();
@@ -36,10 +38,20 @@ public class ProducerService {
 		 props.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 //		 props.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
 		 props.put("value.serializer", JsonPOJOSerializer.class);
+		 
+		 String bootstrapServers = "broker-5-cll14zkm8222msbg.kafka.svc03.us-south.eventstreams.cloud.ibm.com:9093,broker-4-cll14zkm8222msbg.kafka.svc03.us-south.eventstreams.cloud.ibm.com:9093";
+		 String apikey = "LMiMktfiLQZX5hYpeph53nCjuH8b7kU0QKg1PDB5KufV";
+		 Map<String,Object> myProps = appProps.getProducerConfigs(bootstrapServers, apikey);
+		 
 
-		 producer = new KafkaProducer<>(props);
+//		 producer = new KafkaProducer<>(props);
+		 
+		 producer = new KafkaProducer<>(myProps);
+
 
 	}
+	
+	
 
 	private Logger LOGGER = LoggerFactory.getLogger(this.getClass().getName());
 
